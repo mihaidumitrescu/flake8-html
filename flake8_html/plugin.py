@@ -24,6 +24,11 @@ from pygments.formatters import HtmlFormatter
 from flake8.formatting import base
 from jinja2 import Environment, PackageLoader, Markup
 
+if sys.version_info >= (3, 8):
+    import importlib.metadata as importlib_metadata
+else:
+    import importlib_metadata
+
 
 jinja2_env = Environment(
     loader=PackageLoader('flake8_html')
@@ -66,6 +71,9 @@ IndexEntry = namedtuple(
 
 class HTMLPlugin(base.BaseFormatter):
     """A plugin for flake8 to render errors as HTML reports."""
+
+    name = 'flake8-html'
+    version = importlib_metadata.version('flake8-html')
 
     def after_init(self):
         """Configure the plugin run."""
@@ -225,7 +233,7 @@ class HTMLPlugin(base.BaseFormatter):
         formatter = HtmlFormatter(nowrap=True)
         html = highlight(source, PythonLexer(), formatter)
         return {
-            'html_lines': [Markup(l) for l in html.splitlines()],
+            'html_lines': [Markup(ln) for ln in html.splitlines()],
             'css': formatter.get_style_defs()
         }
 
